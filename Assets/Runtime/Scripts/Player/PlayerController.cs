@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour
 
     Vector3 initialPosition;
 
+    private bool isDead = false;
+
     float targetPositionX;
 
     public bool IsGameStarted { get; private set; }
@@ -45,12 +47,8 @@ public class PlayerController : MonoBehaviour
     private bool CanJump => !IsJumping;
     private bool CanRoll => !IsRolling;
 
-    //TODO: Move to GameMode
-    [SerializeField] private float baseScoreMultiplier = 1f;
-    private float score;
-    private float distance;
-    public int Score => Mathf.RoundToInt(score);
-    public int Distance => Mathf.RoundToInt(distance);
+    public float ForwardSpeed => forwardSpeed;
+    public Vector3 InitialPosition => initialPosition;
 
     void Awake()
     {
@@ -60,7 +58,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        ProcessInput();
+        if (!isDead)
+        {
+            ProcessInput();
+        }
 
         Vector3 position = transform.position;
 
@@ -69,12 +70,7 @@ public class PlayerController : MonoBehaviour
         position.z = ProcessForwardMovement();
         ProcessRoll();
 
-        transform.position = position;
-
-        //TODO: Move to GameMode
-        float travelledDistance = forwardSpeed * Time.deltaTime;
-        distance += travelledDistance;
-        score += baseScoreMultiplier * travelledDistance;
+        transform.position = position;                       
     }
 
     private void ProcessInput()
@@ -174,9 +170,25 @@ public class PlayerController : MonoBehaviour
 
     public void Die()
     {
+        isDead = true;
         forwardSpeed = 0;
         StopRoll();
         StopJump();
+        DisableColliders();
         playerAudioController.PlayDeadSound();
+    }
+
+    private void DisableColliders()
+    {
+        regularCollider.enabled = false;
+        rollCollider.enabled = false;
+    }
+
+    public void SetSpeed(float newForwardSpeed)
+    {
+        if (!isDead)
+        {
+            forwardSpeed = newForwardSpeed;
+        }
     }
 }

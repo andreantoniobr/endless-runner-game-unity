@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class PlayerInputController : MonoBehaviour
 {
-    public bool IsReady {get; private set;} = false;
+    private bool isReady = false;
+    public bool IsReady => isReady;
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (IsReady == false)
+            if (isReady == false)
             {
-                IsReady = true;
+                isReady = true;
             }
         }
     }

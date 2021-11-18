@@ -6,4 +6,5 @@ public static class PlayerAnimationConstants
     public const string DieTrigger = "Die";
     public const string IsRolling = "IsRolling";
     public const string RollSpeedMultiplier = "RollMultiplier";
+    public const string StartRun = "StartRun";
 }

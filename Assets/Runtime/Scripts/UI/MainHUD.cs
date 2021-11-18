@@ -5,16 +5,16 @@ using UnityEngine;
 
 public class MainHUD : MonoBehaviour
 {
-    [SerializeField] private PlayerController playerController;
+    [SerializeField] private GameMode gameMode;
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI distanceText;
 
     private void LateUpdate()
     {
-        if (playerController && scoreText && distanceText)
+        if (gameMode && scoreText && distanceText)
         {
-            scoreText.text = $"Score: {playerController.Score}";
-            distanceText.text = $"{playerController.Distance}M";
+            scoreText.text = $"Score: {gameMode.Score}";
+            distanceText.text = $"{gameMode.Distance}M";
         }        
     }
 }

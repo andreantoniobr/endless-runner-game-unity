@@ -8,8 +8,20 @@ public class GameMode : MonoBehaviour
 {    
     [SerializeField] private PlayerController playerController;
     [SerializeField] private PlayerAnimationController playerAnimationController;
-    [SerializeField] private HUDManager hudManager;
+    [SerializeField] private HUDManager hudManager;    
+
+    [Header("Music")]
+    [SerializeField] private MusicPlayer musicPlayer;
+    [SerializeField] private HUDAudioController HUDAudioController;    
+
+    [Header("Gameplay")]
+    [SerializeField] private float startPlayerSpeed = 10f;
+    [SerializeField] private float maxPlayerSpeed = 17f;
+    [SerializeField] private float timeToMaxSpeedSeconds = 300f;
     [SerializeField] private float reloadGameDelay = 3;
+
+    [Header("Score")]
+    [SerializeField] private float baseScoreMultiplier = 1f;
 
     [Header("Countdown")]
     [SerializeField] private int initialCountDownTime = 1;
@@ -18,15 +30,18 @@ public class GameMode : MonoBehaviour
     [SerializeField] private float countdownTime = 0.05f;
     [SerializeField] private int countdownTimeMultiplier = 20;
 
-    [Header("Music")]
-    [SerializeField] private MusicPlayer musicPlayer;
-    [SerializeField] private HUDAudioController HUDAudioController;
+    private float score;
+    private float distance;
+    private float currentTimeToMaxSpeed = 0;
 
     private bool isGameStarted = false;
     private bool isGamePaused = false;
 
     public bool IsGameStarted => isGameStarted;
     public bool IsGamePaused => isGamePaused;
+
+    public int Score => Mathf.RoundToInt(score);
+    public int Distance => Mathf.RoundToInt(distance);
 
     public void OnGameOver()
     {
@@ -64,14 +79,50 @@ public class GameMode : MonoBehaviour
             if (!isGameStarted)
             {
                 StartGame();
-            }           
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             PauseAndResumeGame();
         }
-    }    
+
+        if (isGameStarted)
+        {
+            UpdateDistanceAndScore();
+            UpdatePlayerForwardSpeed();
+            ActivePlayer();
+        }
+    }
+
+    private void ActivePlayer()
+    {
+        if (playerAnimationController.GetAnimationTime(PlayerAnimationConstants.StartRun) >= 1)
+        {
+            playerController.enabled = true;
+        }
+    }
+
+    private void UpdateDistanceAndScore()
+    {
+        distance = Mathf.Abs(playerController.transform.position.z - playerController.InitialPosition.z);
+        score = baseScoreMultiplier * distance;
+    }
+
+    private void UpdatePlayerForwardSpeed()
+    {
+        float forwardSpeed;
+        if (currentTimeToMaxSpeed < timeToMaxSpeedSeconds)
+        {
+            forwardSpeed = Mathf.Lerp(startPlayerSpeed, maxPlayerSpeed, currentTimeToMaxSpeed / timeToMaxSpeedSeconds);
+            currentTimeToMaxSpeed += Time.deltaTime;
+        }
+        else
+        {
+            forwardSpeed = maxPlayerSpeed;
+        }
+        playerController.SetSpeed(forwardSpeed);
+    }
 
     private void Pause()
     {

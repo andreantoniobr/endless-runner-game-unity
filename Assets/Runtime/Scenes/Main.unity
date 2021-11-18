@@ -2506,7 +2506,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71fdf3ab271ec134a91f9c543514a8bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerController: {fileID: 1371181899}
+  gameMode: {fileID: 1860627605}
   scoreText: {fileID: 1611743774}
   distanceText: {fileID: 992488480}
 --- !u!114 &1860627605 stripped
@@ -2753,6 +2753,10 @@ PrefabInstance:
       propertyPath: HUDAudioController
       value: 
       objectReference: {fileID: 1830728203}
+    - target: {fileID: 5473261710550771336, guid: 13e6af26070c6914283530aa501293e8, type: 3}
+      propertyPath: timeToMaxSpeedSeconds
+      value: 300
+      objectReference: {fileID: 0}
     - target: {fileID: 5473261710550771336, guid: 13e6af26070c6914283530aa501293e8, type: 3}
       propertyPath: playerAnimationController
       value: 

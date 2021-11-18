@@ -29,4 +29,15 @@ public class PlayerAnimationController : MonoBehaviour
     {
         animator.SetTrigger(PlayerAnimationConstants.StartGameTrigger);
     }
+
+    public float GetAnimationTime(string stateName)
+    {
+        float animationTime = 0;
+        AnimatorStateInfo animatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        if (animatorStateInfo.IsName(stateName))
+        {
+            animationTime = animatorStateInfo.normalizedTime;
+        };
+        return animationTime;
+    }
 }
