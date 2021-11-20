@@ -124,6 +124,12 @@ public class EndlessTrackGenerator : MonoBehaviour
 
         trackInstance.DecorationSpawner.SpawnDecorations();
 
+        PickupSpawner pickupSpawner = trackInstance.PickupSpawner;
+        if (pickupSpawner)
+        {
+            trackInstance.PickupSpawner.SpawnPickups(player.LaneDistanceX);
+        }        
+
         currentSegments.Add(trackInstance);
 
         UpdateTrackDifficultyParameters();

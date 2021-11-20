@@ -30,6 +30,9 @@ public class GameMode : MonoBehaviour
     [SerializeField] private float countdownTime = 0.05f;
     [SerializeField] private int countdownTimeMultiplier = 20;
 
+    [Header("Pickups")]
+    [SerializeField] private int pickupsCount = 0;
+
     private float score;
     private float distance;
     private float currentTimeToMaxSpeed = 0;
@@ -42,6 +45,11 @@ public class GameMode : MonoBehaviour
 
     public int Score => Mathf.RoundToInt(score);
     public int Distance => Mathf.RoundToInt(distance);
+
+    public int PickupsCount {
+        get { return pickupsCount;  }
+        set { pickupsCount = value; } 
+    }
 
     public void OnGameOver()
     {
@@ -114,7 +122,8 @@ public class GameMode : MonoBehaviour
         float forwardSpeed;
         if (currentTimeToMaxSpeed < timeToMaxSpeedSeconds)
         {
-            forwardSpeed = Mathf.Lerp(startPlayerSpeed, maxPlayerSpeed, currentTimeToMaxSpeed / timeToMaxSpeedSeconds);
+            float timePercent = currentTimeToMaxSpeed / timeToMaxSpeedSeconds;
+            forwardSpeed = Mathf.Lerp(startPlayerSpeed, maxPlayerSpeed, timePercent);
             currentTimeToMaxSpeed += Time.deltaTime;
         }
         else

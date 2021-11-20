@@ -49,6 +49,7 @@ public class PlayerController : MonoBehaviour
 
     public float ForwardSpeed => forwardSpeed;
     public Vector3 InitialPosition => initialPosition;
+    public float LaneDistanceX => laneDistanceX;
 
     void Awake()
     {
