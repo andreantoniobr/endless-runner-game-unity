@@ -18,5 +18,17 @@ public class TrackSegment : MonoBehaviour
 
     public ObstacleSpawner[] ObstacleSpawners => obstacleSpawners;
     public DecorationSpawner DecorationSpawner => decorationSpawner;
-    public PickupSpawner PickupSpawner => pickupSpawner;
+
+    public void SpawnPickups(float laneDistanceX)
+    {
+        if (pickupSpawner)
+        {
+            Vector3[] skipPositions = new Vector3[obstacleSpawners.Length];
+            for (int i = 0; i < skipPositions.Length; i++)
+            {
+                skipPositions[i] = obstacleSpawners[i].transform.position;
+            }        
+            pickupSpawner.SpawnPickups(laneDistanceX, skipPositions);
+        }       
+    }
 }

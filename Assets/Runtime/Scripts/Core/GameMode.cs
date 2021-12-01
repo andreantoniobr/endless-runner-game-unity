@@ -8,7 +8,8 @@ public class GameMode : MonoBehaviour
 {    
     [SerializeField] private PlayerController playerController;
     [SerializeField] private PlayerAnimationController playerAnimationController;
-    [SerializeField] private HUDManager hudManager;    
+    [SerializeField] private HUDManager hudManager;
+    [SerializeField] private GameSaver gameSaver;
 
     [Header("Music")]
     [SerializeField] private MusicPlayer musicPlayer;
@@ -22,23 +23,24 @@ public class GameMode : MonoBehaviour
 
     [Header("Score")]
     [SerializeField] private float baseScoreMultiplier = 1f;
-
+    /*
     [Header("Countdown")]
     [SerializeField] private int initialCountDownTime = 1;
     [SerializeField] private int endCountdownTime = 5;
     [SerializeField] private float scaleIncrement = 0.1f;
     [SerializeField] private float countdownTime = 0.05f;
-    [SerializeField] private int countdownTimeMultiplier = 20;
-
+    [SerializeField] private int countdownTimeMultiplier = 20;*/
+    
     [Header("Pickups")]
     [SerializeField] private int pickupsCount = 0;
 
     private float score;
     private float distance;
-    private float currentTimeToMaxSpeed = 0;
 
     private bool isGameStarted = false;
     private bool isGamePaused = false;
+
+    private float startGametime;
 
     public bool IsGameStarted => isGameStarted;
     public bool IsGamePaused => isGamePaused;
@@ -57,6 +59,10 @@ public class GameMode : MonoBehaviour
         {
             musicPlayer.PlayDeadMusic();
         }
+        if (gameSaver)
+        {
+            gameSaver.SaveGame(Score, PickupsCount);
+        }        
         StartCoroutine(ReloadGameCoroutine());
     }
 
@@ -78,6 +84,8 @@ public class GameMode : MonoBehaviour
         {
             playerController.enabled = false;            
         }
+
+        hudManager.SetActiveOverlay(OverlayName.Start);
     }
 
     private void Update()
@@ -97,8 +105,9 @@ public class GameMode : MonoBehaviour
 
         if (isGameStarted)
         {
-            UpdateDistanceAndScore();
-            UpdatePlayerForwardSpeed();
+            float timePercent = (Time.time - startGametime) / timeToMaxSpeedSeconds;
+            UpdateDistanceAndScore(timePercent);
+            UpdatePlayerForwardSpeed(timePercent);
             ActivePlayer();
         }
     }
@@ -111,49 +120,38 @@ public class GameMode : MonoBehaviour
         }
     }
 
-    private void UpdateDistanceAndScore()
+    private void UpdateDistanceAndScore(float timePercent)
     {
         distance = Mathf.Abs(playerController.transform.position.z - playerController.InitialPosition.z);
-        score = baseScoreMultiplier * distance;
+        float extraScoreMultiplier = 1 + timePercent;
+        score = baseScoreMultiplier * extraScoreMultiplier * distance;
     }
 
-    private void UpdatePlayerForwardSpeed()
+    private void UpdatePlayerForwardSpeed(float timePercent)
     {
-        float forwardSpeed;
-        if (currentTimeToMaxSpeed < timeToMaxSpeedSeconds)
-        {
-            float timePercent = currentTimeToMaxSpeed / timeToMaxSpeedSeconds;
-            forwardSpeed = Mathf.Lerp(startPlayerSpeed, maxPlayerSpeed, timePercent);
-            currentTimeToMaxSpeed += Time.deltaTime;
-        }
-        else
-        {
-            forwardSpeed = maxPlayerSpeed;
-        }
+        float forwardSpeed = Mathf.Lerp(startPlayerSpeed, maxPlayerSpeed, timePercent);
         playerController.SetSpeed(forwardSpeed);
     }
 
     private void Pause()
     {
         Time.timeScale = 0f;
-        hudManager.ChangeUI(isGamePaused);
+        hudManager.SetActiveOverlay(OverlayName.Pause);
     }
 
     private void Resume()
     {
         Time.timeScale = 1f;
-        hudManager.ChangeUI(isGamePaused);
+        hudManager.SetActiveOverlay(OverlayName.MainHud);
     }
 
     public void StartGame()
     {
-        hudManager.StartCountdown(initialCountDownTime, endCountdownTime, countdownTime, scaleIncrement, countdownTimeMultiplier);
-
+        //hudManager.StartCountdown(initialCountDownTime, endCountdownTime, countdownTime, scaleIncrement, countdownTimeMultiplier);
         isGameStarted = true;
-
+        startGametime = Time.time;
         HUDAudioController.PlayButtonPressSound();
-
-        hudManager.ChangeUI(IsGamePaused);
+        hudManager.SetActiveOverlay(OverlayName.MainHud);
 
         if (musicPlayer)
         {
@@ -181,5 +179,24 @@ public class GameMode : MonoBehaviour
                 Resume();
             }
         }        
+    }
+
+    public void QuitGame()
+    {
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
+        #endif
+    }
+
+    public void Settings()
+    {
+        hudManager.SetActiveOverlay(OverlayName.Settings);
+    }
+
+    public void CloseSettings()
+    {
+        hudManager.SetActiveOverlay(OverlayName.Start);
     }
 }
