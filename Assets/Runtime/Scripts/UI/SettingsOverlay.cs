@@ -48,8 +48,8 @@ public class SettingsOverlay : MonoBehaviour
     {
         if (mainVolumeSlider && musicVolumeSlider && SFXVolumeSlider && currentAudioMixerVolume != null)
         {
-            mainVolumeSlider.value = currentAudioMixerVolume.mainVolume;
-            musicVolumeSlider.value = currentAudioMixerVolume.musicVolume;
+            mainVolumeSlider.value = currentAudioMixerVolume.MainVolume;
+            musicVolumeSlider.value = currentAudioMixerVolume.MusicVolume;
             SFXVolumeSlider.value = currentAudioMixerVolume.SFXVolume;
         }
     }
@@ -74,7 +74,7 @@ public class SettingsOverlay : MonoBehaviour
     {
         if (currentAudioMixerVolume != null)
         {
-            gameAudioManager.SetAudioMixerVolume(currentAudioMixerVolume.mainVolume, currentAudioMixerVolume.musicVolume, currentAudioMixerVolume.SFXVolume);
+            gameAudioManager.SetAudioMixerVolume(currentAudioMixerVolume.MainVolume, currentAudioMixerVolume.MusicVolume, currentAudioMixerVolume.SFXVolume);
         }
     }
 
@@ -82,7 +82,7 @@ public class SettingsOverlay : MonoBehaviour
     {
         if (gameAudioManager)
         {
-            currentAudioMixerVolume.mainVolume = value;
+            currentAudioMixerVolume.MainVolume = value;
             UpdateAudioMixerVolume();
         }
     }
@@ -91,7 +91,7 @@ public class SettingsOverlay : MonoBehaviour
     {
         if (gameAudioManager)
         {
-            currentAudioMixerVolume.musicVolume = value;
+            currentAudioMixerVolume.MusicVolume = value;
             UpdateAudioMixerVolume();
         }
     }

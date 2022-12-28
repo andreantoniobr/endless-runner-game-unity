@@ -13,11 +13,11 @@ public static class AudioMixerConstants
 public class GameAudioData
 {
     [Range(0.0f, 1.0f)]
-    public float mainVolume;
+    public float MainVolume = 1f;
     [Range(0.0f, 1.0f)]
-    public float musicVolume;
+    public float MusicVolume = 1f;
     [Range(0.0f, 1.0f)]
-    public float SFXVolume;
+    public float SFXVolume = 1f;
 }
 
 public class GameAudioManager : MonoBehaviour
@@ -39,7 +39,7 @@ public class GameAudioManager : MonoBehaviour
         if (gameSaver)
         {
             currentAudioMixerVolume = gameSaver.GameAudioData;
-            SetAudioMixerVolume(currentAudioMixerVolume.mainVolume, currentAudioMixerVolume.musicVolume, currentAudioMixerVolume.SFXVolume);
+            SetAudioMixerVolume(currentAudioMixerVolume.MainVolume, currentAudioMixerVolume.MusicVolume, currentAudioMixerVolume.SFXVolume);
         }
     }
 
@@ -64,8 +64,8 @@ public class GameAudioManager : MonoBehaviour
 
         currentAudioMixerVolume = new GameAudioData
         {
-            mainVolume = mainVolume,
-            musicVolume = musicVolume,
+            MainVolume = mainVolume,
+            MusicVolume = musicVolume,
             SFXVolume = SFXVolume
         };
 

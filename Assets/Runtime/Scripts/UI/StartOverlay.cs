@@ -17,15 +17,15 @@ public class StartOverlay : MonoBehaviour
         {        
             if (highestScore)
             {
-                highestScore.text = gameSaver.GameData.highestScore.ToString();
+                highestScore.text = gameSaver.GameData.HighestScore.ToString();
             }
             if (lastScore)
             {
-                lastScore.text = gameSaver.GameData.lastScore.ToString();
+                lastScore.text = gameSaver.GameData.LastScore.ToString();
             }
             if (cherriesAmount)
             {
-                cherriesAmount.text = gameSaver.GameData.cherriesAmount.ToString();
+                cherriesAmount.text = gameSaver.GameData.CherriesAmount.ToString();
             }
         }
     }

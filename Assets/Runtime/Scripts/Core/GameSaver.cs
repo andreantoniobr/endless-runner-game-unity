@@ -1,6 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
+using System.IO;
+
+// https://www.newtonsoft.com/json/help/html/SerializingJSON.htm
+//https://www.technical-recipes.com/2018/how-to-serialize-and-deserialize-objects-using-newtonsoft-json/
 
 public static class GameSaverConstants
 {
@@ -11,9 +16,27 @@ public static class GameSaverConstants
 
 public class GameData
 {
-    public int highestScore;
-    public int lastScore;
-    public int cherriesAmount;
+    private int highestScore;
+    private int lastScore;
+    private int cherriesAmount;
+
+    public int HighestScore 
+    { 
+        get => highestScore;
+        set => highestScore = value;
+    }
+
+    public int LastScore
+    { 
+        get => lastScore;
+        set => lastScore = value;
+    }
+
+    public int CherriesAmount
+    {
+        get => cherriesAmount;
+        set => cherriesAmount = value;
+    }
 }
 
 public class GameSaver : MonoBehaviour
@@ -21,77 +44,140 @@ public class GameSaver : MonoBehaviour
     private GameData gameData;
     private GameAudioData gameAudioData;
 
-    public GameData GameData => GetGameData();
-    public GameAudioData GameAudioData => GetGameAudioData();
+    public GameData GameData => gameData;
+    public GameAudioData GameAudioData => gameAudioData;
 
-    private void SaveHighestScore(int scoreAmount)
+
+    private string gameDataPath;
+    private string gameAudioDataPath;
+
+    private void Awake()
     {
-        int highestScoreData = GameData.highestScore;
-        if (highestScoreData < scoreAmount)
+        gameDataPath = $"{Application.persistentDataPath}/GameDataSave.txt";
+        gameAudioDataPath = $"{Application.persistentDataPath}/AudioDataSave.txt";
+        GetGameData();
+    }
+
+    private void GetGameData()
+    {
+        gameData = GetSaveData(gameDataPath) ?? new GameData();
+        gameAudioData = GetAudioSaveData(gameAudioDataPath) ?? new GameAudioData();
+    }
+
+    private int GetHighestScoreAmount(int currentScoreAmount)
+    {
+        int highestScoreAmount = gameData.HighestScore;
+        if (currentScoreAmount > highestScoreAmount)
         {
-            PlayerPrefs.SetInt(GameSaverConstants.HighestScore, scoreAmount);
-        }        
+            highestScoreAmount = currentScoreAmount;
+        }
+        return highestScoreAmount;
     }
 
-    private void SaveLastScore(int scoreAmount)
+    private int GetCherriesAmount(int currentCherriesAmount)
     {
-        PlayerPrefs.SetInt(GameSaverConstants.LastScore, scoreAmount);
-    }
-
-    private void SaveCherriesAmount(int cherriesAmount)
-    {
-        int cherriesAmountData = GameData.cherriesAmount;
-        PlayerPrefs.SetInt(GameSaverConstants.CherriesAmount, cherriesAmountData + cherriesAmount);
-    }
-
-    private void SaveAudioGroupVolume(string audioMixerGroup, float volumePercent)
-    {
-        if (volumePercent >= 0f && volumePercent <= 1f)
+        int cherriesAmount = gameData.CherriesAmount;
+        if (cherriesAmount >= 0 && currentCherriesAmount >= 0)
         {
-            PlayerPrefs.SetFloat(audioMixerGroup, volumePercent);
+            cherriesAmount += currentCherriesAmount;
+        }
+        return cherriesAmount;
+    }
+
+    public void SaveGame(int currentScoreAmount, int currentCherriesAmount)
+    {
+        GameData gameData = new GameData
+        {
+            HighestScore = GetHighestScoreAmount(currentScoreAmount),
+            LastScore = currentScoreAmount,
+            CherriesAmount = GetCherriesAmount(currentCherriesAmount)
+        };
+        GenerateSaveFile(gameDataPath, gameData);
+    }
+
+    private void GenerateSaveFile(string path, GameData saveData)
+    {
+        JsonSerializer serializer = new JsonSerializer();
+        using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write))
+        using (StreamWriter streamWriter = new StreamWriter(stream))
+        using (JsonWriter jsonWriter = new JsonTextWriter(streamWriter))
+        {
+            serializer.Serialize(jsonWriter, saveData);
         }
     }
 
-    private GameData GetGameData()
+    private void GenerateAudioSaveFile(string path, GameAudioData saveData)
     {
-        gameData = new GameData
+        JsonSerializer serializer = new JsonSerializer();
+        using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write))
+        using (StreamWriter streamWriter = new StreamWriter(stream))
+        using (JsonWriter jsonWriter = new JsonTextWriter(streamWriter))
         {
-            highestScore = PlayerPrefs.GetInt(GameSaverConstants.HighestScore, 0),
-            lastScore = PlayerPrefs.GetInt(GameSaverConstants.LastScore, 0),
-            cherriesAmount = PlayerPrefs.GetInt(GameSaverConstants.CherriesAmount, 0)
-        };
-        return gameData;
+            serializer.Serialize(jsonWriter, saveData);
+        }
     }
 
-    private GameAudioData GetGameAudioData()
+    private GameData GetSaveData(string path)
     {
-        gameAudioData = new GameAudioData
+        JsonSerializer serializer = new JsonSerializer();
+        using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Read))
+        using (StreamReader streamReader = new StreamReader(stream))
+        using (JsonReader jsonReader = new JsonTextReader(streamReader))
         {
-            mainVolume = PlayerPrefs.GetFloat(AudioMixerConstants.MainVolume, 1f),
-            musicVolume = PlayerPrefs.GetFloat(AudioMixerConstants.MusicVolume, 1f),
-            SFXVolume = PlayerPrefs.GetFloat(AudioMixerConstants.SFXVolume, 1f)
-        };
-        return gameAudioData;
+            return serializer.Deserialize<GameData>(jsonReader);
+        }
     }
 
-    public void SaveGame(int scoreAmount, int cherriesAmount)
+    private GameAudioData GetAudioSaveData(string path)
     {
-        SaveHighestScore(scoreAmount);
-        SaveLastScore(scoreAmount);
-        SaveCherriesAmount(cherriesAmount);
+        JsonSerializer serializer = new JsonSerializer();
+        using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Read))
+        using (StreamReader streamReader = new StreamReader(stream))
+        using (JsonReader jsonReader = new JsonTextReader(streamReader))
+        {
+            return serializer.Deserialize<GameAudioData>(jsonReader);
+        }
     }
 
-    public void SaveAudioVolumePrefs(float mainVolume, float musicVolume, float SFXVolume)
+    private void DeleteSaveFile(string saveFilePath)
     {
-        SaveAudioGroupVolume(AudioMixerConstants.MainVolume, mainVolume);
-        SaveAudioGroupVolume(AudioMixerConstants.MusicVolume, musicVolume);
-        SaveAudioGroupVolume(AudioMixerConstants.SFXVolume, SFXVolume);
-    }
+        if (File.Exists(saveFilePath))
+        {
+            File.Delete(saveFilePath);
+        }        
+    }   
 
     public void DeleteGameData()
-    {
+    {        
+        DeleteSaveFile(gameDataPath);
+        DeleteSaveFile(gameAudioDataPath);
         gameData = null;
         gameAudioData = null;
-        PlayerPrefs.DeleteAll();
+        GetGameData();
+    }    
+    
+    public void SaveAudioVolumePrefs(float mainVolume, float musicVolume, float SFXVolume)
+    {
+        GameAudioData gameAudioSaveData = GenerateGameAudioData(mainVolume, musicVolume, SFXVolume);
+        GenerateAudioSaveFile(gameAudioDataPath, gameAudioSaveData);
+    }
+
+    private GameAudioData GenerateGameAudioData(float _mainVolume, float _musicVolume, float _SFXVolume)
+    {
+        return new GameAudioData
+        {
+            MainVolume = GetAudioGroupVolume(_mainVolume),
+            MusicVolume = GetAudioGroupVolume(_musicVolume),
+            SFXVolume = GetAudioGroupVolume(_SFXVolume)
+        };    
+    }
+    private float GetAudioGroupVolume(float volumePercent)
+    {
+        float audioGroupVolumePercent = 0f;
+        if (volumePercent >= 0f && volumePercent <= 1f)
+        {
+            audioGroupVolumePercent = volumePercent;
+        }
+        return audioGroupVolumePercent;
     }
 }
