@@ -6,46 +6,24 @@ public class MovableObstacle : Obstacle
 {
     [SerializeField] private float horizontalSpeed = 1f;
     [SerializeField] private float laneSizeX = 2f;
-    
-    private Vector3 initialPosition;
-    private float targetPositionX;
-    private float deltaPosition = 0.1f;
-    private float LeftLaneX => initialPosition.x - laneSizeX;
-    private float RightLaneX => initialPosition.x + laneSizeX;
-    
 
-    private void Awake()
-    {
-        targetPositionX = LeftLaneX;
-    }
+    private float positionTime;
 
     private void Update()
     {
-        Vector3 position = transform.position;
-        UpdateTargetPosition(position);
-        UpdatePosition(position);
+        UpdatePosition();
     }
 
-    private void UpdatePosition(Vector3 position)
+    private void UpdatePosition()
     {
-        position.x = GetHorizontalPosition();
+        Vector3 position = transform.position;
+        position.x = GetPositionX();
         transform.position = position;
     }
 
-    private void UpdateTargetPosition(Vector3 position)
+    private float GetPositionX()
     {
-        if (position.x >= RightLaneX - deltaPosition)
-        {
-            targetPositionX = LeftLaneX;
-        }
-        else if (position.x <= LeftLaneX + deltaPosition)
-        {
-            targetPositionX = RightLaneX;
-        }
-    }
-
-    private float GetHorizontalPosition()
-    {
-        return Mathf.Lerp(transform.position.x, targetPositionX, Time.deltaTime * horizontalSpeed);
+        positionTime += Time.deltaTime * horizontalSpeed;
+        return (Mathf.PingPong(positionTime, 1) - 0.5f) * 2 * laneSizeX;
     }
 }
