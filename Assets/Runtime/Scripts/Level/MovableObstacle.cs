@@ -9,6 +9,8 @@ public class MovableObstacle : Obstacle
 
     private float positionTime;
 
+    public float MovementDuration => laneSizeX * 2 / horizontalSpeed;
+
     private void Update()
     {
         UpdatePosition();
