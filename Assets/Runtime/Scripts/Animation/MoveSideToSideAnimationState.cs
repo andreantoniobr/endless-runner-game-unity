@@ -15,7 +15,8 @@ public class MoveSideToSideAnimationState : StateMachineBehaviour
             MovableObstacle obstacle = animator.transform.parent.parent.parent.GetComponent<MovableObstacle>();
             if (obstacle)
             {
-                float multiplier = jumpClipInfo.clip.length / obstacle.MovementDuration;
+                float timeToCompleteAnimationCicle = obstacle.MovementDuration * 2;
+                float multiplier = jumpClipInfo.clip.length / timeToCompleteAnimationCicle;
                 animator.SetFloat(RatAnimationConstants.SideToSideMultiplier, multiplier);
             }
         }
