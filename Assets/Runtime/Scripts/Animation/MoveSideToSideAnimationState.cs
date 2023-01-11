@@ -7,7 +7,7 @@ public class MoveSideToSideAnimationState : StateMachineBehaviour
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        AnimatorClipInfo[] clips = animator.GetNextAnimatorClipInfo(layerIndex);
+        AnimatorClipInfo[] clips = animator.GetCurrentAnimatorClipInfo(layerIndex);
         if (clips.Length > 0)
         {
             AnimatorClipInfo jumpClipInfo = clips[0];
