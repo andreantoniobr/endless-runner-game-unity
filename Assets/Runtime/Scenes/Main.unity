@@ -6963,6 +6963,14 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1371181899}
+    - target: {fileID: 8569686738747452692, guid: 33de45b349ff61b468ab74499f79fa80, type: 3}
+      propertyPath: maxTracksBeforeReward
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8569686738747452692, guid: 33de45b349ff61b468ab74499f79fa80, type: 3}
+      propertyPath: minTracksBeforeReward
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8569686738747452693, guid: 33de45b349ff61b468ab74499f79fa80, type: 3}
       propertyPath: m_RootOrder
       value: 4
