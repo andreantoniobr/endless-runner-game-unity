@@ -2,7 +2,7 @@
 
 Mobile game created in Unity as part of a GameDevPro project to apply learning basic concepts of Unity and programming with C#.
 
-![Endless Runner!](Images/EndlessRunner.png)
+![Endless Runner!](Images/endlessRunner.png)
 
 ### Implementation
 
